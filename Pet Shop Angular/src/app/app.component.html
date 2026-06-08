@@ -1,0 +1,204 @@
+<div class="min-h-screen bg-white relative flex flex-col antialiased">
+  
+  <!-- Background Yarn Lines and Scattered Walking Paws -->
+  <app-background-doodles></app-background-doodles>
+  
+  <!-- Dynamic Floating Navigation -->
+  <header class="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-slate-100 shadow-sm px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <img
+          src="assets/images/lg-t1.svg"
+          alt="Logo Pet Shop"
+          referrerPolicy="no-referrer"
+          class="w-10 h-10 object-contain"
+        />
+        <span class="font-display font-black text-base tracking-widest text-slate-800">
+          PET SHOP
+        </span>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <button
+          (click)="isContactOpen = true"
+          class="text-xs font-bold text-slate-600 hover:text-pet-pink transition cursor-pointer hidden sm:inline-block"
+        >
+          Falar Conosco
+        </button>
+        <button
+          (click)="isBookingOpen = true"
+          class="px-5 py-2 bg-gradient-to-r from-pet-blue to-pet-pink hover:opacity-95 text-white rounded-full font-bold text-xs md:text-sm hover:scale-[1.03] active:scale-[0.97] transition-all cursor-pointer shadow-md shadow-pet-pink/10"
+        >
+          Agendar Banho ✨
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Sections -->
+  <main class="flex-1">
+    
+    <!-- HERO SECTION -->
+    <app-hero (onOpenContact)="isContactOpen = true"></app-hero>
+
+    <!-- GUIDING PAWS 1 -->
+    <div class="py-8 bg-transparent flex justify-center overflow-hidden">
+      <div class="flex flex-col items-center">
+        <span class="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-4 select-none">
+          Caminho para o SPA
+        </span>
+        <app-walking-paws [count]="5" [colors]="['#3cbff0', '#e72585', '#d2d700']"></app-walking-paws>
+      </div>
+    </div>
+
+    <!-- BATH & GROOMING SECTION -->
+    <app-bath-grooming (onOpenBooking)="isBookingOpen = true"></app-bath-grooming>
+
+    <!-- GUIDING PAWS 2 -->
+    <div class="py-12 bg-transparent flex justify-center overflow-hidden">
+      <div class="flex flex-col items-center">
+        <span class="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-4 select-none">
+          Avançar para Cosméticos & Rações
+        </span>
+        <app-walking-paws [count]="5" [colors]="['#e72585', '#d2d700', '#3cbff0']"></app-walking-paws>
+      </div>
+    </div>
+
+    <!-- PRODUCTS SECTION -->
+    <app-products (onOpenContact)="isContactOpen = true"></app-products>
+
+    <!-- GUIDING PAWS 3 -->
+    <div class="py-10 bg-transparent flex justify-center overflow-hidden">
+      <div class="flex flex-col items-center">
+        <span class="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-4 select-none">
+          Visite-nos ou envie mensagem
+        </span>
+        <app-walking-paws [count]="4" [colors]="['#d2d700', '#3cbff0', '#e72585']"></app-walking-paws>
+      </div>
+    </div>
+
+    <!-- CONTACT FORM AND MAPS SECTION -->
+    <app-contact-map></app-contact-map>
+
+    <!-- GUIDING PAWS 4 -->
+    <div class="py-10 bg-transparent flex justify-center overflow-hidden">
+      <div class="flex flex-col items-center">
+        <span class="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-4 select-none animate-pulse">
+          Redes de Carinho
+        </span>
+        <app-walking-paws [count]="6" [horizontal]="true" [colors]="['#3cbff0', '#e72585', '#d2d700']"></app-walking-paws>
+      </div>
+    </div>
+
+    <!-- SOCIAL MEDIA FOOTER -->
+    <app-social-footer></app-social-footer>
+
+  </main>
+
+  <!-- MODALS -->
+  <app-booking-modal
+    [isOpen]="isBookingOpen"
+    (onClose)="isBookingOpen = false"
+    (onAddBooking)="handleAddBooking($event)"
+  ></app-booking-modal>
+  
+  <app-contact-modal
+    [isOpen]="isContactOpen"
+    (onClose)="isContactOpen = false"
+  ></app-contact-modal>
+
+  <!-- ACTIVE APPOINTMENTS FLOAT BADGE -->
+  <ng-container *ngIf="appointments.length > 0">
+    <!-- Round Badge -->
+    <button
+      [@fadeInScale]
+      (click)="showBookingsPane = true"
+      class="fixed bottom-6 right-6 z-30 bg-slate-900 border-2 border-pet-pink text-white hover:bg-slate-800 p-4 rounded-full shadow-2xl cursor-pointer hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group"
+    >
+      <svg lucideCalendar class="w-5 h-5 text-pet-lime group-hover:rotate-12 transition-transform"></svg>
+      <span class="text-xs font-bold leading-none bg-pet-pink px-2 py-1 rounded-full text-white">
+        {{appointments.length}}
+      </span>
+      <span class="text-xs font-black uppercase text-slate-200 block max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300">
+        Meus Agendamentos
+      </span>
+    </button>
+
+    <!-- List side-pane drawer -->
+    <div *ngIf="showBookingsPane" class="fixed inset-0 z-50 flex justify-end p-4">
+      <div
+        [@fade]
+        (click)="showBookingsPane = false"
+        class="absolute inset-0 bg-slate-900/40 backdrop-blur-xs"
+      ></div>
+
+      <div
+        [@slideInRight]
+        class="relative w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-900 flex flex-col z-10"
+      >
+        <div class="bg-slate-900 text-white p-5 border-b border-slate-800 flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            <svg lucideCalendar class="w-5 h-5 text-pet-lime"></svg>
+            <h4 class="font-bold text-sm tracking-tight">Meus Agendamentos ({{appointments.length}})</h4>
+          </div>
+          <button
+            (click)="showBookingsPane = false"
+            class="p-1 cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-full transition-colors"
+          >
+            Voltar
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+          <div
+            *ngFor="let appt of appointments"
+            class="bg-white border border-slate-100 p-4 rounded-2xl shadow-sm space-y-3 relative overflow-hidden"
+          >
+            <div class="absolute top-0 right-0 w-2 h-full bg-gradient-to-b from-pet-blue to-pet-pink"></div>
+            
+            <div class="flex justify-between items-start pr-3">
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+                  {{appt.service}}
+                </span>
+                <h5 class="font-black text-slate-800 mt-1">{{appt.petName}}</h5>
+                <p class="text-[10px] text-slate-400">Pet: {{appt.petType}} ({{appt.petSize}})</p>
+              </div>
+
+              <button
+                (click)="handleDeleteBooking(appt.id)"
+                title="Excluir Agendamento"
+                class="p-2 cursor-pointer bg-red-50 hover:bg-red-100 text-red-500 rounded-xl transition duration-150"
+              >
+                <svg lucideTrash2 class="w-3.5 h-3.5"></svg>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-xs font-medium text-slate-600">
+              <div class="flex items-center gap-1.5">
+                <svg lucideClock class="w-3.5 h-3.5 text-pet-blue"></svg>
+                <span>{{appt.time}}</span>
+              </div>
+              <div class="flex items-center gap-1.5 justify-end">
+                <svg lucideCheckCircle class="w-3.5 h-3.5 text-emerald-500"></svg>
+                <span class="text-[10px] text-emerald-600 font-bold uppercase">{{appt.status}}</span>
+              </div>
+            </div>
+
+            <div class="pt-1.5 text-[10px] text-slate-500 flex justify-between">
+              <span>Dono: {{appt.clientName}}</span>
+              <span class="font-mono text-slate-400">{{formatDate(appt.date)}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-white border-t border-slate-100 text-center">
+          <p class="text-xs text-slate-400">
+            Chegue 10 minutos antes no endereço indicado!
+          </p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+</div>
