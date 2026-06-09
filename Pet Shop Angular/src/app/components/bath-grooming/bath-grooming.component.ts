@@ -3,13 +3,18 @@ import { CommonModule } from '@angular/common';
 import { LucideSparkles, LucideCalendar, LucideShieldCheck, LucideHeart } from '@lucide/angular';
 import { trigger, transition, style, animate, state } from '@angular/animations';
 import { PawIconComponent } from '../paw-icon/paw-icon.component';
+import { AnimateOnScrollDirective } from '../../directives/animate-on-scroll.directive';
 
 @Component({
   selector: 'app-bath-grooming',
   standalone: true,
-  imports: [CommonModule, LucideSparkles, LucideCalendar, LucideShieldCheck, LucideHeart, PawIconComponent],
+  imports: [CommonModule, LucideSparkles, LucideCalendar, LucideShieldCheck, LucideHeart, PawIconComponent, AnimateOnScrollDirective],
   template: `
-    <section class="relative w-full py-20 px-6 md:px-12 lg:px-24 bg-transparent overflow-hidden">
+    <section 
+      appAnimateOnScroll 
+      (visible)="isVisible = $event"
+      class="relative w-full py-20 px-6 md:px-12 lg:px-24 bg-transparent overflow-hidden"
+    >
       <!-- Massive Watermark Page Background Paw Print -->
       <div class="absolute -right-24 md:-right-40 top-[-50px] w-80 h-80 md:w-[600px] md:h-[600px] select-none pointer-events-none opacity-[0.08] text-pet-blue z-0">
         <app-paw-icon className="w-full h-full"></app-paw-icon>
@@ -20,7 +25,7 @@ import { PawIconComponent } from '../paw-icon/paw-icon.component';
         <!-- Left Side: Benefits text and Booking Button -->
         <div class="lg:col-span-7 flex flex-col justify-center text-left order-2 lg:order-1">
           <div
-            [@slideInLeft]
+            [@slideInLeft]="isVisible ? 'visible' : 'hidden'"
             class="space-y-6"
           >
             <div class="space-y-2">
@@ -43,7 +48,10 @@ import { PawIconComponent } from '../paw-icon/paw-icon.component';
             <div class="space-y-5">
               <div
                 *ngFor="let benefit of benefits; let i = index"
-                [@fadeInUp]="{ value: '', params: { delay: i * 150 + 'ms' } }"
+                [@fadeInUp]="{ 
+                  value: isVisible ? 'visible' : 'hidden', 
+                  params: { delay: i * 150 + 'ms' } 
+                }"
                 class="flex gap-4 items-start p-4 hover:bg-slate-50 rounded-2xl transition duration-200 border border-transparent hover:border-slate-100"
               >
                 <div class="p-2.5 rounded-xl bg-white shadow-sm border border-slate-100">
@@ -89,7 +97,7 @@ import { PawIconComponent } from '../paw-icon/paw-icon.component';
 
           <!-- Dog Image -->
           <div
-            [@imageAnim]
+            [@imageAnim]="isVisible ? 'visible' : 'hidden'"
             class="relative w-72 h-72 md:w-96 md:h-96 rounded-3xl overflow-hidden border-8 border-white shadow-2xl hover:scale-105 duration-300 group cursor-pointer z-10"
           >
             <div class="absolute top-4 right-4 bg-pet-pink text-white text-[11px] font-extrabold px-3 py-1.5 rounded-full z-20 shadow-md">
@@ -112,27 +120,29 @@ import { PawIconComponent } from '../paw-icon/paw-icon.component';
   `,
   animations: [
     trigger('slideInLeft', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(-30px)' }),
-        animate('600ms ease-out', style({ opacity: 1, transform: 'translateX(0)' }))
-      ])
+      state('hidden', style({ opacity: 0, transform: 'translateX(-30px)' })),
+      state('visible', style({ opacity: 1, transform: 'translateX(0)' })),
+      transition('hidden => visible', animate('600ms ease-out')),
+      transition('visible => hidden', animate('400ms ease-in'))
     ]),
     trigger('fadeInUp', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(15px)' }),
-        animate('500ms {{delay}} ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
-      ], { params: { delay: '0ms' } })
+      state('hidden', style({ opacity: 0, transform: 'translateY(15px)' })),
+      state('visible', style({ opacity: 1, transform: 'translateY(0)' })),
+      transition('hidden => visible', animate('500ms {{delay}} ease-out'), { params: { delay: '0ms' } }),
+      transition('visible => hidden', animate('300ms ease-in'))
     ]),
     trigger('imageAnim', [
-      transition(':enter', [
-        style({ opacity: 0, scale: 0.85, rotate: '3deg' }),
-        animate('700ms cubic-bezier(0.175, 0.885, 0.32, 1.275)', style({ opacity: 1, scale: 1, rotate: '0deg' }))
-      ])
+      state('hidden', style({ opacity: 0, scale: 0.85, rotate: '3deg' })),
+      state('visible', style({ opacity: 1, scale: 1, rotate: '0deg' })),
+      transition('hidden => visible', animate('700ms cubic-bezier(0.175, 0.885, 0.32, 1.275)')),
+      transition('visible => hidden', animate('400ms ease-in'))
     ])
   ]
 })
 export class BathGroomingComponent {
   @Output() onOpenBooking = new EventEmitter<void>();
+  isVisible = false;
+
 
   benefits = [
     {

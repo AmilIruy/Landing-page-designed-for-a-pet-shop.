@@ -1,15 +1,20 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideShoppingBag, LucideMessageCircle } from '@lucide/angular';
-import { trigger, transition, style, animate } from '@angular/animations';
+import { trigger, transition, style, animate, state } from '@angular/animations';
 import { PawIconComponent } from '../paw-icon/paw-icon.component';
+import { AnimateOnScrollDirective } from '../../directives/animate-on-scroll.directive';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, LucideShoppingBag, LucideMessageCircle, PawIconComponent],
+  imports: [CommonModule, LucideShoppingBag, LucideMessageCircle, PawIconComponent, AnimateOnScrollDirective],
   template: `
-    <section class="relative w-full py-20 px-6 md:px-12 lg:px-24 bg-transparent overflow-hidden">
+    <section 
+      appAnimateOnScroll
+      (visible)="isVisible = $event"
+      class="relative w-full py-20 px-6 md:px-12 lg:px-24 bg-transparent overflow-hidden"
+    >
       <!-- Massive Watermark Page Background Paw Print -->
       <div class="absolute -left-24 md:-left-40 top-[-50px] w-80 h-80 md:w-[600px] md:h-[600px] select-none pointer-events-none opacity-[0.08] text-pet-pink z-0">
         <app-paw-icon className="w-full h-full"></app-paw-icon>
@@ -34,7 +39,7 @@ import { PawIconComponent } from '../paw-icon/paw-icon.component';
 
           <!-- Core image -->
           <div
-            [@imageAnim]
+            [@imageAnim]="isVisible ? 'visible' : 'hidden'"
             class="relative w-72 h-72 md:w-96 md:h-96 rounded-3xl overflow-hidden border-8 border-white bg-white shadow-2xl hover:scale-105 duration-300 group cursor-pointer z-10"
           >
             <div class="absolute top-4 left-4 bg-pet-lime text-slate-800 text-[10px] font-black px-3 py-1.5 rounded-full z-20 shadow-md border border-white flex items-center gap-1">
@@ -56,7 +61,7 @@ import { PawIconComponent } from '../paw-icon/paw-icon.component';
         <!-- Right Side: Text and Categories -->
         <div class="lg:col-span-7 flex flex-col justify-center text-left">
           <div
-            [@slideInRight]
+            [@slideInRight]="isVisible ? 'visible' : 'hidden'"
             class="space-y-6"
           >
             <div class="space-y-2">
@@ -109,21 +114,22 @@ import { PawIconComponent } from '../paw-icon/paw-icon.component';
   `,
   animations: [
     trigger('slideInRight', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(30px)' }),
-        animate('600ms ease-out', style({ opacity: 1, transform: 'translateX(0)' }))
-      ])
+      state('hidden', style({ opacity: 0, transform: 'translateX(30px)' })),
+      state('visible', style({ opacity: 1, transform: 'translateX(0)' })),
+      transition('hidden => visible', animate('600ms ease-out')),
+      transition('visible => hidden', animate('400ms ease-in'))
     ]),
     trigger('imageAnim', [
-      transition(':enter', [
-        style({ opacity: 0, scale: 0.85, rotate: '-3deg' }),
-        animate('700ms cubic-bezier(0.175, 0.885, 0.32, 1.275)', style({ opacity: 1, scale: 1, rotate: '0deg' }))
-      ])
+      state('hidden', style({ opacity: 0, scale: 0.85, rotate: '-3deg' })),
+      state('visible', style({ opacity: 1, scale: 1, rotate: '0deg' })),
+      transition('hidden => visible', animate('700ms cubic-bezier(0.175, 0.885, 0.32, 1.275)')),
+      transition('visible => hidden', animate('400ms ease-in'))
     ])
   ]
 })
 export class ProductsComponent {
   @Output() onOpenContact = new EventEmitter<void>();
+  isVisible = false;
 
   categories = [
     {
@@ -140,3 +146,4 @@ export class ProductsComponent {
     },
   ];
 }
+

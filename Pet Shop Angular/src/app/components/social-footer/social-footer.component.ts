@@ -1,15 +1,20 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideCamera, LucideUsers, LucideVideo, LucideHeart, LucideArrowDown, LucideExternalLink } from '@lucide/angular';
-import { trigger, transition, style, animate } from '@angular/animations';
+import { trigger, transition, style, animate, state } from '@angular/animations';
 import { PawIconComponent } from '../paw-icon/paw-icon.component';
+import { AnimateOnScrollDirective } from '../../directives/animate-on-scroll.directive';
 
 @Component({
   selector: 'app-social-footer',
   standalone: true,
-  imports: [CommonModule, LucideCamera, LucideUsers, LucideVideo, LucideHeart, LucideArrowDown, LucideExternalLink, PawIconComponent],
+  imports: [CommonModule, LucideCamera, LucideUsers, LucideVideo, LucideHeart, LucideArrowDown, LucideExternalLink, PawIconComponent, AnimateOnScrollDirective],
   template: `
-    <footer class="relative bg-slate-900 text-white py-16 px-6 md:px-12 overflow-hidden border-t-8 border-pet-lime">
+    <footer 
+      appAnimateOnScroll
+      (visible)="isVisible = $event"
+      class="relative bg-slate-900 text-white py-16 px-6 md:px-12 overflow-hidden border-t-8 border-pet-lime"
+    >
       <!-- Decorative vector background -->
       <div class="absolute inset-0 opacity-[0.02] pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]"></div>
 
@@ -32,7 +37,7 @@ import { PawIconComponent } from '../paw-icon/paw-icon.component';
         <!-- Dynamic pointing phrase -->
         <div class="space-y-4 max-w-2xl">
           <p
-            [@fadeInUp]
+            [@fadeInUp]="isVisible ? 'visible' : 'hidden'"
             class="text-lg md:text-xl font-medium tracking-wide text-slate-100"
           >
              Acompanhe nossa rotina repleta de fofura, amor e mimos diários! Siga nossas redes sociais e não perca nenhum pet feliz:
@@ -77,15 +82,16 @@ import { PawIconComponent } from '../paw-icon/paw-icon.component';
   `,
   animations: [
     trigger('fadeInUp', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(15px)' }),
-        animate('500ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
-      ])
+      state('hidden', style({ opacity: 0, transform: 'translateY(15px)' })),
+      state('visible', style({ opacity: 1, transform: 'translateY(0)' })),
+      transition('hidden => visible', animate('500ms ease-out')),
+      transition('visible => hidden', animate('300ms ease-in'))
     ])
   ]
 })
 export class SocialFooterComponent {
   currentYear = new Date().getFullYear();
+  isVisible = false;
 
   socialLinks = [
     {
@@ -111,3 +117,4 @@ export class SocialFooterComponent {
     },
   ];
 }
+
